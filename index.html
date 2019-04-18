@@ -2,7 +2,6 @@
   <html>
   <head>
     <title>Ryan is the big gay</title>
-    <script src="functions.js"></script>
   </head>
 
   <body>
@@ -10,6 +9,17 @@
   <h3 onclick="clickMe()">Click Me!</h3>
   <p id="clicky">hi</p>
 
+  <script>
+  function clickMe(){
+    var about=document.getElementById("clicky");
+    if (about.innerHTML=="he's still the big gay"){
+        about.innerHTML="hi";
+    }
+    else if (about.innerHTML=="hi"){
+        about.innerHTML="he's still the big gay";
+    }
+  }
+  </script>
   </body>
 
   </html>
