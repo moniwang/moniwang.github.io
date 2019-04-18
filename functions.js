@@ -1,4 +1,4 @@
-function writeAbout(){
+function clickMe(){
     var about=document.getElementById("clicky");
     if (about.innerHTML=="he's still the big gay"){
         about.innerHTML="";
