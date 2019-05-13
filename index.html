@@ -1,33 +1,52 @@
-<!Doctype html>
-  <html>
+<!DOCTYPE html>
+<html>
   <head>
-    <title>Ryan is the big gay</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>page-slider-js</title>
+    <script src="slider.js"></script>
+    <link rel="stylesheet" href="slider.css">
+
+    <style>
+      #norwegian {
+        background: linear-gradient(225deg, #ffc27d, #ff8e93);
+      }
+      #french {
+        background: linear-gradient(#f3defc, #63a3e6);
+      }
+      #spanish {
+        background: linear-gradient(#d2fcad, #22eaeb);
+      }
+      #hindi{
+        background: linear-gradient(#f0bed4, #a163f5);
+      }
+      #mandarin {
+        background: linear-gradient(#65cce1, #6365ec);
+      }
+
+      section > span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 7vw;
+        font-family: sans-serif;
+        text-transform: uppercase;
+        color: #fff;
+      }
+    </style>
   </head>
-
   <body>
-  <h1>ryan will always be the big gay</h1>
-  <button onclick="clickMe()">Click Me!</button>
-  <p id="clicky"></p>
-  <img src="ryan.jpg">
+    <div class="slides">
+      <section id="norwegian"><span>Hallo</span></section>
+      <section id="french"><span>Bonjour</span></section>
+      <section id="spanish"><span>Hola</span></section>
+      <section id="hindi"><span>Namaste</span></section>
+      <section id="mandarin"><span>你好</span></section>
+    </div>
 
-  <script>
-  function clickMe(){
-    var about=document.getElementById("clicky");
-    if (about.innerHTML=="he's still the big gay"){
-        about.innerHTML="";
-    }
-    else {
-        about.innerHTML="he's still the big gay";
-    }
-  }
-  </script>
+    <script>
+      slider('.slides');
+    </script>
   </body>
-  
-  <body>
-    <p>------------------------------------------------------------------</p>
-    <h1>Monica Wang</h1>
-    <h2>Student at the University of Michigan</h2>
-    <p>I am currently pursuing a B.S.E. in Computer Science at the University of Michigan graduating in 2020 with skills in both computer languages/software, through classes, and teamwork, through experiences outside of school.</p>
-  </body>
-
-  </html>
+</html>
