@@ -28,12 +28,14 @@ h2 {
 }
 section {
     text-align: left;
-    margin: 50px;
-    margin-left: 150px;
+    margin: 2em;
+    margin-left: 5em;
 }
-
+/* 
 .hexagon {
-    position: absolute;
+    display: inline-block;
+    float: right;
+    padding-left: 15px;
     top: 50%;
     left: 50%;
     transform: translate(10%, -90%) rotate(120deg);
@@ -58,4 +60,4 @@ section {
     overflow: hidden;
     background: url(../img/monica.JPG);
     background-size: contain;
-}
+} */
