@@ -1,7 +1,7 @@
 html,
 body {
-    background-color: #EAE7DC;
-    color: #8E8D8A;
+    background-color: #0B0C10;
+    color: #45A29E;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .courier {
@@ -20,11 +20,11 @@ h2, h3 {
 }
 
 h1 {
-    color: #E85A4F;
+    color: #C5C6C7;
 }
 
-h3 {
-    color: #D8C3A5;
+h2 {
+    color: #66FCF1;
 }
 section {
     text-align: left;
