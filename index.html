@@ -1,704 +1,286 @@
 <!DOCTYPE html>
-<!--[if lt IE 9 ]><html class="no-js oldie" lang="en"> <![endif]-->
-<!--[if IE 9 ]><html class="no-js oldie ie9" lang="en"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!-->
-<html class="no-js" lang="en">
-<!--<![endif]-->
-
+<html lang="en">
 <head>
-
-    <!--- basic page needs
-    ================================================== -->
-    <meta charset="utf-8">
-    <title>Monica Wang</title>
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <!-- mobile specific metas
-    ================================================== -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- CSS
-    ================================================== -->
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/vendor.css">
-    <link rel="stylesheet" href="css/main.css">
-
-    <!-- script
-    ================================================== -->
-    <script src="js/modernizr.js"></script>
-    <script src="js/pace.min.js"></script>
-
-    <!-- favicons
-    ================================================== -->
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monica Wang</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #fdf8f3; --warm-white: #fffcf8; --sand: #f0e8dc;
+      --terracotta: #c8705a; --brown: #7a4f3a; --dark: #2e1f14;
+      --mid: #6b5045; --light-text: #a0836f; --border: #e8d9cd;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--dark); line-height: 1.7; }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 5%; background: rgba(253,248,243,0.9);
+      backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: 'Lora', serif; font-size: 1.15rem; color: var(--brown); text-decoration: none; font-weight: 600; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--mid); font-size: 0.9rem; font-weight: 500; letter-spacing: 0.03em; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--terracotta); }
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      padding: 6rem 10% 4rem; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -100px; right: -80px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(200,112,90,0.12) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none;
+    }
+    .hero-content { max-width: 680px; position: relative; z-index: 1; }
+    .hero-greeting {
+      font-size: 0.95rem; color: var(--terracotta); font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .hero-greeting::before { content: ''; display: inline-block; width: 24px; height: 2px; background: var(--terracotta); }
+    h1 { font-family: 'Lora', serif; font-size: clamp(2.8rem, 6vw, 4.5rem); line-height: 1.15; color: var(--dark); margin-bottom: 1.2rem; }
+    h1 em { font-style: italic; color: var(--terracotta); }
+    .hero-tagline { font-size: 1.15rem; color: var(--mid); font-weight: 300; max-width: 500px; margin-bottom: 2.5rem; }
+    .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn { display: inline-block; padding: 0.8rem 1.8rem; border-radius: 50px; font-size: 0.92rem; font-weight: 500; text-decoration: none; transition: all 0.25s ease; cursor: pointer; border: none; }
+    .btn-primary { background: var(--terracotta); color: white; box-shadow: 0 4px 16px rgba(200,112,90,0.3); }
+    .btn-primary:hover { background: var(--brown); transform: translateY(-2px); }
+    .btn-outline { background: transparent; color: var(--brown); border: 2px solid var(--border); }
+    .btn-outline:hover { border-color: var(--terracotta); color: var(--terracotta); transform: translateY(-2px); }
+    .scroll-hint {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+      color: var(--light-text); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
+      animation: bounce 2.5s infinite;
+    }
+    @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+    section { padding: 6rem 10%; }
+    .section-label {
+      font-size: 0.82rem; color: var(--terracotta); font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .section-label::before { content: ''; display: inline-block; width: 16px; height: 2px; background: var(--terracotta); }
+    h2 { font-family: 'Lora', serif; font-size: clamp(1.8rem, 3.5vw, 2.6rem); color: var(--dark); margin-bottom: 1.5rem; line-height: 1.3; }
+    .about-section { background: var(--warm-white); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+    .about-text p { color: var(--mid); margin-bottom: 1.2rem; font-size: 1.02rem; }
+    .about-pills { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.8rem; }
+    .pill { padding: 0.4rem 1rem; background: var(--sand); color: var(--brown); border-radius: 50px; font-size: 0.85rem; font-weight: 500; }
+    .about-image-wrapper { position: relative; }
+    .about-image-placeholder {
+      width: 100%; aspect-ratio: 4/5;
+      background: linear-gradient(135deg, var(--sand) 0%, #e8d5c4 100%);
+      border-radius: 2rem; display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .about-avatar {
+      width: 100px; height: 100px; background: var(--terracotta); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-family: 'Lora', serif; font-size: 2.2rem; font-weight: 600; position: relative; z-index: 1;
+    }
+    .about-floater {
+      position: absolute; background: white; border-radius: 1rem;
+      padding: 0.8rem 1.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      font-size: 0.85rem; font-weight: 500;
+    }
+    .about-floater.f1 { bottom: 2rem; left: -1.5rem; color: var(--brown); }
+    .about-floater.f2 { top: 2rem; right: -1.5rem; color: var(--brown); }
+    .about-floater span { color: var(--terracotta); font-size: 1.1rem; }
+    .work-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.8rem; margin-top: 2.5rem; }
+    .project-card { background: var(--warm-white); border-radius: 1.5rem; overflow: hidden; border: 1px solid var(--border); transition: transform 0.25s ease, box-shadow 0.25s ease; cursor: pointer; }
+    .project-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(122,79,58,0.12); }
+    .card-banner { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+    .card-banner.c1 { background: linear-gradient(135deg,#fde8e0,#f5c4b0); }
+    .card-banner.c2 { background: linear-gradient(135deg,#e0ede8,#b8d8c8); }
+    .card-banner.c3 { background: linear-gradient(135deg,#e8e0f5,#c4b0f5); }
+    .card-body { padding: 1.6rem; }
+    .card-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+    .tag { font-size: 0.75rem; padding: 0.2rem 0.7rem; border-radius: 50px; background: var(--sand); color: var(--brown); font-weight: 500; }
+    .card-body h3 { font-family: 'Lora', serif; font-size: 1.2rem; color: var(--dark); margin-bottom: 0.5rem; }
+    .card-body p { font-size: 0.92rem; color: var(--mid); line-height: 1.6; margin-bottom: 1rem; }
+    .card-link { font-size: 0.88rem; color: var(--terracotta); font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem; transition: gap 0.2s; }
+    .card-link:hover { gap: 0.5rem; }
+    .skills-section { background: var(--warm-white); }
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2.5rem; }
+    .skill-group { background: var(--cream); border-radius: 1.2rem; padding: 1.6rem; border: 1px solid var(--border); }
+    .skill-group-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+    .skill-group h4 { font-family: 'Lora', serif; font-size: 1rem; color: var(--dark); margin-bottom: 0.8rem; }
+    .skill-list { list-style: none; }
+    .skill-list li { font-size: 0.88rem; color: var(--mid); padding: 0.3rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; }
+    .skill-list li:last-child { border-bottom: none; }
+    .skill-list li::before { content: '·'; color: var(--terracotta); font-weight: bold; font-size: 1.2rem; }
+    .contact-section { text-align: center; background: linear-gradient(135deg, var(--sand) 0%, #edd8c8 100%); }
+    .contact-section p { color: var(--mid); max-width: 480px; margin: 0 auto 2.5rem; font-size: 1.05rem; }
+    .contact-links { display: flex; justify-content: center; gap: 1.2rem; flex-wrap: wrap; }
+    .contact-chip {
+      display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.4rem;
+      background: white; color: var(--brown); border-radius: 50px; text-decoration: none;
+      font-size: 0.9rem; font-weight: 500; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: all 0.2s;
+    }
+    .contact-chip:hover { background: var(--terracotta); color: white; transform: translateY(-2px); }
+    footer { text-align: center; padding: 2rem; color: var(--light-text); font-size: 0.85rem; border-top: 1px solid var(--border); }
+    footer a { color: var(--terracotta); text-decoration: none; }
+    @media (max-width: 768px) {
+      .hero { padding: 6rem 5% 4rem; } section { padding: 4rem 5%; }
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .about-image-wrapper { order: -1; max-width: 300px; margin: 0 auto; }
+    }
+    .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+  </style>
 </head>
-
-<body id="top">
-
-    <!-- header
-    ================================================== -->
-    <header class="s-header">
-
-        <div class="header-logo">
-            <!--<a class="site-logo" href="index.html"><img src="images/logo.png" alt="Homepage"></a>-->
-        </div>
-
-        <nav class="header-nav-wrap">
-            <ul class="header-nav">
-                <li class="current"><a class="smoothscroll"  href="#home" title="home">Home</a></li>
-                <li><a class="smoothscroll"  href="#about" title="about">About</a></li>
-                <li><a class="smoothscroll"  href="#works" title="works">Projects</a></li>
-                <li><a class="smoothscroll"  href="#contact" title="contact">Contact</a></li>
-            </ul>
-        </nav>
-
-        <a class="header-menu-toggle" href="#0"><span>Menu</span></a>
-
-    </header> <!-- end s-header -->
-
-
-   <!-- home
-   ================================================== -->
-   <section id="home" class="s-home page-hero target-section" data-parallax="scroll" data-image-src="images/hero-bg.jpg" data-natural-width=3000 data-natural-height=2000 data-position-y=center>
-
-        <div class="overlay"></div>
-        <div class="shadow-overlay"></div>
-
-        <div class="home-content">
-
-            <div class="row home-content__main">
-
-                <h3>Hi</h3>
-
-                <h1>
-                    My name is <br>
-                    Monica Wang. <br>
-                    <!--University of Michigan-->
-                </h1>
-
-                <div class="home-content__buttons">
-                    <a href="#works" class="smoothscroll btn btn--stroke">
-                        Latest Projects
-                    </a>
-                    <a href="#about" class="smoothscroll btn btn--stroke">
-                        More About Me
-                    </a>
-                </div>
-
-                <div class="home-content__scroll">
-                    <a href="#about" class="scroll-link smoothscroll">
-                        <span>Scroll Down</span>
-                    </a>
-                </div>
-
-            </div>
-
-        </div> <!-- end home-content -->
-
-        <ul class="home-social">
-            <li>
-                <a href="https://www.facebook.com/moni.q.wang"><i class="im im-facebook" aria-hidden="true"></i><span>Facebook</span></a>
-            </li>
-            <!--<li>
-                <a href="#"><i class="im im-twitter" aria-hidden="true"></i><span>Twiiter</span></a>
-            </li>-->
-            <li>
-                <a href="https://www.instagram.com/moniiwang/"><i class="im im-instagram" aria-hidden="true"></i><span>Instagram</span></a>
-            </li>
-            <li>
-                <a href="https://github.com/moniwang"><i class="im im-github" aria-hidden="true"></i><span>Github</span></a>
-            </li>
-            <li>
-                <a href="https://www.linkedin.com/in/monica-q-wang/"><i class="im im-linkedin" aria-hidden="true"></i><span>LinkedIn</span></a>
-            </li>
-        </ul> 
-        <!-- end home-social -->
-
-    </section> <!-- end s-home -->
-
-
-    <!-- about
-    ================================================== -->
-    <section id="about" class="s-about target-section">
-        
-        <div class="row narrow section-intro has-bottom-sep">
-            <div class="col-full text-center">
-                <h3>About</h3>
-                <h1>More About Me</h1>
-                <p class="lead">I am currently studying at the University of Michigan. I am planning to complete a B.S.E. in Computer Science in the year 2020.</p>
-            </div>
-        </div>
-
-        <div class="row about-content">
-
-            <div class="col-six tab-full left">
-                <h3>Classes!</h3>
-
-                <p>I take a lot of classes.</p>
-
-                <p>
-                Like a lot.	
-                </p>
-            </div>
-
-            <div class="col-six tab-full right">
-                <h3>I've Got Some skills.</h3>
-
-                <ul class="skill-bars">
-                    <li>
-                    <div class="progress percent90"><span>90%</span></div>
-                    <strong>C++</strong>
-                    </li>
-                    <li>
-                    <div class="progress percent85"><span>85%</span></div>
-                    <strong>Python</strong>
-                    </li>
-                    <li>
-                    <div class="progress percent70"><span>70%</span></div>
-                    <strong>Java</strong>
-                    </li>
-                </ul>
-            </div>
-
-        </div> <!-- end about-content -->
-
-        <div class="row about-content about-content--buttons">
-
-            <div class="col-six tab-full left">
-                <a href="#0" class="btn btn--primary full-width">Download My Resume</a>
-            </div>
-            <div class="col-six tab-full right">
-                <a href="#0" class="btn full-width">Hire Me Now</a>
-            </div>
-
-        </div> <!-- end about-content buttons -->
-
-        <div class="row about-content about-content--timeline">
-
-            <div class="col-full text-center">
-                <h3>My Work Experience.</h3>
-            </div>
-
-            <div class="col-six tab-full left">
-                <div class="timeline">
-
-                    <div class="timeline__block">
-                        <div class="timeline__bullet"></div>
-                        <div class="timeline__header">
-                            <p class="timeline__timeframe">May 2019 - Present</p>
-                            <h3>Amazon Robotics</h3>
-                            <h5>Software Development Intern</h5>
-                        </div>
-                        <div class="timeline__desc">
-                            <p>We do stuff, not sure yet actually because it starts on the 18th.</p>
-                        </div>
-                    </div> <!-- end timeline__block ->
-                    
-                    <div class="timeline__block">
-                        <div class="timeline__bullet"></div>
-                        <div class="timeline__header">
-                            <p class="timeline__timeframe">July 2014 - June 2015</p>
-                            <h3>Super Cool Agency</h3>
-                            <h5>Front-end Developer</h5>
-                        </div>
-                        <div class="timeline__desc">	
-                            <p>Lorem ipsum Occaecat do esse ex et dolor culpa nisi ex in magna consectetur nisi cupidatat laboris esse eiusmod deserunt aute do quis velit esse sed Ut proident cupidatat nulla esse cillum laborum occaecat nostrud sit dolor incididunt amet est occaecat nisi incididunt.</p>
-                        </div>
-                    </div> <!- end timeline__block -->
-
-                </div> <!-- end timeline -->
-            </div> <!-- end left -->
-
-            <div class="col-six tab-full right">
-                <div class="timeline">
-
-                    <div class="timeline__block">
-                        <div class="timeline__bullet"></div>
-                        <div class="timeline__header">
-                            <p class="timeline__timeframe">July 2014 - June 2017</p>
-                            <h3>Barker Animation Studio</h3>
-                            <h5>Sales Associate</h5>
-                        </div>
-                        <div class="timeline__desc">
-                            <p>I dressed up as a minion.</p>
-                        </div>
-                    </div> <!-- end timeline__block ->
-
-                    <div class="timeline__block">
-                        <div class="timeline__bullet"></div>
-                        <div class="timeline__header">
-                            <p class="timeline__timeframe">July 2011 - June 2012</p>
-                            <h3>Epic Design Agency</h3>
-                            <h5>Web Designer</h5>
-                        </div>
-                        <div class="timeline__desc">
-                            <p>Lorem ipsum Occaecat do esse ex et dolor culpa nisi ex in magna consectetur nisi cupidatat laboris esse eiusmod deserunt aute do quis velit esse sed Ut proident cupidatat nulla esse cillum laborum occaecat nostrud sit dolor incididunt amet est occaecat nisi incididunt.</p>
-                        </div>
-                    </div> <!- end timeline__block -->
-
-                </div> <!-- end timeline -->
-            </div> <!-- end right -->
-
-        </div> <!-- end about-content timeline -->
-
-    </section> <!-- end about -->
-    
-
-    <!-- works
-    ================================================== -->
-    <section id="works" class="s-works target-section">
-
-        <div class="row narrow section-intro has-bottom-sep">
-            <div class="col-full">
-                <h3>Portfolio</h3>
-                <h1>See My Latest Projects.</h1>
-                
-                <p class="lead">Projects yo.</p>
-            </div>
-        </div>
-
-        <div class="row masonry-wrap">
-            <div class="masonry">
-
-                <div class="masonry__brick">
-                    <div class="item-folio">
-
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-beetle.jpg" class="thumb-link" title="The Beetle Car" data-size="1050x700">
-                                <img src="images/portfolio/beetle.jpg" 
-                                     srcset="images/portfolio/beetle.jpg 1x, images/portfolio/beetle@2x.jpg 2x" alt="">
-                                <span class="shadow-overlay"></span>
-                            </a>
-                        </div>
-
-                        <div class="item-folio__text">
-                            <h3 class="item-folio__title">
-                                The Beetle
-                            </h3>
-                            <p class="item-folio__cat">
-                                Web Development
-                            </p>
-                        </div>
-
-                        <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link">
-                            <i class="im im-link"></i>
-                        </a>
-
-                        <div class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </div>
-
-                    </div> <!-- end item-folio -->
-                </div> <!-- end masonry__brick -->
-
-                <div class="masonry__brick">
-                    <div class="item-folio">
-
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-lighthouse.jpg" class="thumb-link" title="Lighthouse" data-size="1050x700">
-                                <img src="images/portfolio/lighthouse.jpg" 
-                                     srcset="images/portfolio/lighthouse.jpg 1x, images/portfolio/lighthouse@2x.jpg 2x" alt="">
-                                <span class="shadow-overlay"></span>
-                            </a>
-                        </div>
-
-                        <div class="item-folio__text">
-                            <h3 class="item-folio__title">
-                                Lighthouse
-                            </h3>
-                            <p class="item-folio__cat">
-                                Web Design
-                            </p>
-                        </div>
-
-                        <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link">
-                            <i class="im im-link"></i>
-                        </a>
-
-                        <div class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </div>
-
-                    </div> <!-- end item-folio -->
-                </div> <!-- end masonry__brick -->
-
-                <div class="masonry__brick">
-                    <div class="item-folio">
-
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-salad.jpg" class="thumb-link" data-size="1050x700">
-                                <img src="images/portfolio/salad.jpg" 
-                                     srcset="images/portfolio/salad.jpg 1x, images/portfolio/salad@2x.jpg 2x" alt="">
-                                <span class="shadow-overlay"></span>
-                            </a>
-                        </div>
-
-                        <div class="item-folio__text">
-                            <h3 class="item-folio__title">
-                                Salad
-                            </h3>
-                            <p class="item-folio__cat">
-                                Branding
-                            </p>
-                        </div>
-
-                        <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link">
-                            <i class="im im-link"></i>
-                        </a>
-
-                        <span class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </span>
-
-                    </div> <!-- end item-folio -->
-                </div> <!-- end masonry__brick -->
-
-                <div class="masonry__brick">
-                    <div class="item-folio">
-
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-woodcraft.jpg" class="thumb-link" data-size="1050x700">
-                                <img src="images/portfolio/woodcraft.jpg"
-                                     srcset="images/portfolio/woodcraft.jpg 1x, images/portfolio/woodcraft@2x.jpg 2x" alt="">
-                                <span class="shadow-overlay"></span>
-                            </a>
-                        </div>
-
-                        <div class="item-folio__text">
-                            <h3 class="item-folio__title">
-                                Woodcraft
-                            </h3>
-                            <p class="item-folio__cat">
-                                Branding
-                            </p>
-                        </div>
-
-                        <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link">
-                            <i class="im im-link"></i>
-                        </a>
-
-                        <span class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </span>
-
-                    </div> <!-- end item-folio -->
-                </div> <!-- end masonry__brick -->
-
-                <div class="masonry__brick">
-                    <div class="item-folio">
-
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-skaterboy.jpg" class="thumb-link" data-size="1050x700">
-                                <img src="images/portfolio/skaterboy.jpg"
-                                     srcset="images/portfolio/skaterboy.jpg 1x, images/portfolio/skaterboy@2x.jpg 2x" alt="">
-                                <span class="shadow-overlay"></span>
-                            </a>
-                        </div>
-
-                        <div class="item-folio__text">
-                            <h3 class="item-folio__title">
-                                Skaterboy
-                            </h3>
-                            <p class="item-folio__cat">
-                                Web Development
-                            </p>
-                        </div>
-
-                        <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link">
-                            <i class="im im-link"></i>
-                        </a>
-
-                        <span class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </span>
-
-                    </div> <!-- end item-folio -->
-                </div> <!-- end masonry__brick -->
-
-                <div class="masonry__brick">
-                    <div class="item-folio">
-
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-liberty.jpg" class="thumb-link" data-size="1050x700">
-                                <img src="images/portfolio/liberty.jpg"
-                                     srcset="images/portfolio/liberty.jpg 1x, images/portfolio/liberty@2x.jpg 2x" alt="">
-                                <span class="shadow-overlay"></span>
-                            </a>
-                        </div>
-
-                        <div class="item-folio__text">
-                            <h3 class="item-folio__title">
-                                Liberty
-                            </h3>
-                            <p class="item-folio__cat">
-                                Branding
-                            </p>
-                        </div>
-
-                        <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link">
-                            <i class="im im-link"></i>
-                        </a>
-
-                        <span class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </span>
-
-                    </div> <!-- end item-folio -->
-                </div> <!-- end masonry__brick -->
-
-                <div class="masonry__brick">
-                    <div class="item-folio">
-
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-minimalismo.jpg" class="thumb-link" data-size="1050x700">
-                                <img src="images/portfolio/minimalismo.jpg"
-                                     srcset="images/portfolio/minimalismo.jpg 1x, images/portfolio/minimalismo@2x.jpg 2x" alt="">
-                                <span class="shadow-overlay"></span>
-                            </a>
-                        </div>
-
-                        <div class="item-folio__text">
-                            <h3 class="item-folio__title">
-                                Minimalismo
-                            </h3>
-                            <p class="item-folio__cat">
-                                Web Design
-                            </p>
-                        </div>
-
-                        <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link">
-                            <i class="im im-link"></i>
-                        </a>
-
-                        <span class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </span>
-
-                    </div> <!-- end item-folio -->
-                </div> <!-- end masonry__brick -->
-
-                <div class="masonry__brick">
-                    <div class="item-folio">
-
-                        <div class="item-folio__thumb">
-                            <a href="images/portfolio/gallery/g-shutterbug.jpg" class="thumb-link" data-size="1050x700">
-                                <img src="images/portfolio/shutterbug.jpg"
-                                     srcset="images/portfolio/shutterbug.jpg 1x, images/portfolio/shutterbug@2x.jpg 2x" alt="">
-                                <span class="shadow-overlay"></span>
-                            </a>
-                        </div>
-
-                        <div class="item-folio__text">
-                            <h3 class="item-folio__title">
-                                Lady Shutterbug
-                            </h3>
-                            <p class="item-folio__cat">
-                                Branding
-                            </p>
-                        </div>
-
-                        <a href="https://www.behance.net/" class="item-folio__project-link" title="Project link">
-                            <i class="im im-link"></i>
-                        </a>
-
-                        <span class="item-folio__caption">
-                            <p>Vero molestiae sed aut natus excepturi. Et tempora numquam. Temporibus iusto quo.Unde dolorem corrupti neque nisi.</p>
-                        </span>
-
-                    </div> <!-- end item-folio -->
-                </div> <!-- end masonry__brick -->
-
-            </div>
-        </div> <!-- end masonry -->
-
-    </section> <!-- end works -->
-
-    <!-- s-stats
-    ================================================== ->
-    <section id="stats" class="s-stats">
-        <div class="row block-1-4 block-tab-1-2 block-mob-full stats">
-
-            <div class="col-block stats__col ">
-                <div class="stats__count">
-                    1
-                </div>
-                <h4>Awards Received</h4>
-            </div>
-            <div class="col-block stats__col">
-                <div class="stats__count">
-                    3
-                </div>
-                <h4>Cups of Coffee</h4>
-            </div>
-            <div class="col-block stats__col stats__col--highlight">
-                <div class="stats__upsign">
-                    <a href="#"><i class="im im-arrow-up" aria-hidden="true"></i></a>
-                </div>
-                <div class="stats__count">
-                    8
-                </div>
-                <h4>Projects Completed</h4>
-            </div>
-            <div class="col-block stats__col">
-                <div class="stats__count">
-                    2
-                </div>
-                <h4>Happy Clients</h4> 
-            </div>
-
-        </div>
-    </section> <!- end s-stats -->
-
-
-    <!-- s-stats
-    ================================================== -->
-    <section id="contact" class="s-contact target-section">
-
-        <div class="overlay"></div>
-
-        <div class="row narrow section-intro">
-            <div class="col-full">
-                <h3>Contact</h3>
-                <h1>Say Hello.</h1>
-                
-                <p class="lead">moniwang[at]umich[dot]edu</p>
-            </div>
-        </div>
-
-        <!--<div class="row contact__main">
-            <div class="col-eight tab-full contact__form">
-                <form name="contactForm" id="contactForm" method="post" action="">
-                    <fieldset>
-    
-                    <div class="form-field">
-                        <input name="contactName" type="text" id="contactName" placeholder="Name" value="" minlength="2" required="" aria-required="true" class="full-width">
-                    </div>
-                    <div class="form-field">
-                        <input name="contactEmail" type="email" id="contactEmail" placeholder="Email" value="" required="" aria-required="true" class="full-width">
-                    </div>
-                    <div class="form-field">
-                        <input name="contactSubject" type="text" id="contactSubject" placeholder="Subject" value="" class="full-width">
-                    </div>
-                    <div class="form-field">
-                        <textarea name="contactMessage" id="contactMessage" placeholder="message" rows="10" cols="50" required="" aria-required="true" class="full-width"></textarea>
-                    </div>
-                    <div class="form-field">
-                        <button class="full-width btn--primary">Submit</button>
-                        <div class="submit-loader">
-                            <div class="text-loader">Sending...</div>
-                            <div class="s-loader">
-                                <div class="bounce1"></div>
-                                <div class="bounce2"></div>
-                                <div class="bounce3"></div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    </fieldset>
-                </form>-->
-
-                <!-- contact-warning ->
-                <div class="message-warning">
-                    Something went wrong. Please try again.
-                </div> 
-            
-                <!- contact-success ->
-                <div class="message-success">
-                    Your message was sent, thank you!<br>
-                </div>
-                        
-            </div>
-            <div class="col-four tab-full contact__infos">
-                <!-<h4 class="h06">Phone</h4>
-                <p>Phone: (+63) 555 1212<br>
-                Mobile: (+63) 555 0100<br>
-                Fax: (+63) 555 0101
-                </p>->
-
-                <h4 class="h06">Email</h4>
-                <p>moniwang[at]umich[dot]edu
-                </p>
-
-                <!-<h4 class="h06">Address</h4>
-                <p>
-                1600 Amphitheatre Parkway<br>
-                Mountain View, CA<br>
-                94043 US
-                </p>->
-            </div>
-
-        </div>-->
-
-    </section> <!-- end s-contact -->
-
-
-    <!-- footer
-    ================================================== -->
-    <footer>
-        <div class="row">
-            <div class="col-full">
-
-                <div class="footer-logo">
-                    <!--<a class="footer-site-logo" href="#0"><img src="images/logo.png" alt="Homepage"></a>-->
-                </div>
-
-                <ul class="footer-social">
-                    <li><a href="https://www.facebook.com/moni.q.wang">
-                        <i class="im im-facebook" aria-hidden="true"></i>
-                        <span>Facebook</span>
-                    </a></li>
-                    <!--<li><a href="#0">
-                        <i class="im im-twitter" aria-hidden="true"></i>
-                        <span>Twitter</span>
-                    </a></li>-->
-                    <li><a href="https://www.instagram.com/moniiwang/">
-                        <i class="im im-instagram" aria-hidden="true"></i>
-                        <span>Instagram</span>
-                    </a></li>
-                    <li><a href="https://github.com/moniwang">
-                        <i class="im im-github" aria-hidden="true"></i>
-                        <span>Github</span>
-                    </a></li>
-                    <li><a href="https://www.linkedin.com/in/monica-q-wang/">
-                        <i class="im im-linkedin" aria-hidden="true"></i>
-                        <span>LinkedIn</span>
-                    </a></li>
-                </ul>
-                    
-            </div>
-        </div>
-
-        <div class="row footer-bottom">
-            <div class="col-twelve">
-                <div class="copyright">
-                    <span>© Copyright Hola 2017</span> 
-                    <span>Design by <a href="https://www.styleshout.com/">styleshout</a></span>	
-                </div>
-
-                <div class="go-top">
-                <a class="smoothscroll" title="Back to Top" href="#top"><i class="im im-arrow-up" aria-hidden="true"></i></a>
-                </div>
-            </div>
-
-        </div> <!-- end footer-bottom -->
-
-    </footer> <!-- end footer -->
-
-
-    <div id="preloader">
-        <div id="loader"></div>
+<body>
+  <nav>
+    <a href="#" class="nav-logo">Monica Wang</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <p class="hero-greeting">Welcome, I'm</p>
+      <h1>Monica <em>Wang</em></h1>
+      <p class="hero-tagline">I craft thoughtful experiences at the intersection of design and technology — with curiosity, care, and a bit of warmth.</p>
+      <div class="hero-ctas">
+        <a href="#work" class="btn btn-primary">View My Work</a>
+        <a href="#contact" class="btn btn-outline">Say Hello</a>
+      </div>
     </div>
-
-
-    <!-- Java Script
-    ================================================== -->
-    <script src="js/jquery-3.2.1.min.js"></script>
-    <script src="js/plugins.js"></script>
-    <script src="js/main.js"></script>
-
+    <div class="scroll-hint">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      Scroll
+    </div>
+  </section>
+  <section class="about-section" id="about">
+    <div class="about-grid">
+      <div class="about-text fade-in">
+        <p class="section-label">About Me</p>
+        <h2>A little about who I am</h2>
+        <p>Hi! I'm Monica — a creator who loves bringing ideas to life. Whether it's through design, code, or collaboration, I'm driven by the belief that the best work happens when people and technology feel in harmony.</p>
+        <p>When I'm not building things, you can find me exploring new coffee shops, reading, or getting lost in a good film. I believe the little things make all the difference.</p>
+        <div class="about-pills">
+          <span class="pill">Creative Thinker</span>
+          <span class="pill">Problem Solver</span>
+          <span class="pill">Lifelong Learner</span>
+          <span class="pill">Team Player</span>
+        </div>
+      </div>
+      <div class="about-image-wrapper fade-in">
+        <div class="about-image-placeholder"><div class="about-avatar">MW</div></div>
+        <div class="about-floater f1"><span>&#10024;</span> Always curious</div>
+        <div class="about-floater f2"><span>&#128161;</span> Big ideas</div>
+      </div>
+    </div>
+  </section>
+  <section id="work">
+    <p class="section-label">Work</p>
+    <h2>Projects I'm proud of</h2>
+    <p style="color:var(--mid);max-width:540px;">A selection of things I've built and explored. Each project is a story — here are a few chapters.</p>
+    <div class="work-grid">
+      <div class="project-card fade-in">
+        <div class="card-banner c1">&#127807;</div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag">Design</span><span class="tag">UX</span></div>
+          <h3>Project One</h3>
+          <p>A thoughtful experience crafted from the ground up — focusing on clarity, ease of use, and delightful details.</p>
+          <a href="#" class="card-link">View project &#8594;</a>
+        </div>
+      </div>
+      <div class="project-card fade-in">
+        <div class="card-banner c2">&#128300;</div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag">Research</span><span class="tag">Data</span></div>
+          <h3>Project Two</h3>
+          <p>Deep-diving into data to surface insights that actually matter — turning complexity into clarity.</p>
+          <a href="#" class="card-link">View project &#8594;</a>
+        </div>
+      </div>
+      <div class="project-card fade-in">
+        <div class="card-banner c3">&#128640;</div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag">Product</span><span class="tag">Strategy</span></div>
+          <h3>Project Three</h3>
+          <p>From zero to launch — building something people love takes patience, iteration, and a lot of heart.</p>
+          <a href="#" class="card-link">View project &#8594;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="skills-section" id="skills">
+    <div class="fade-in">
+      <p class="section-label">Skills</p>
+      <h2>What I bring to the table</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-group fade-in">
+        <div class="skill-group-icon">&#127912;</div>
+        <h4>Design</h4>
+        <ul class="skill-list"><li>UI / UX Design</li><li>Figma &amp; Prototyping</li><li>Visual Storytelling</li><li>Brand Identity</li></ul>
+      </div>
+      <div class="skill-group fade-in">
+        <div class="skill-group-icon">&#128187;</div>
+        <h4>Development</h4>
+        <ul class="skill-list"><li>HTML / CSS / JavaScript</li><li>React</li><li>Python</li><li>Version Control (Git)</li></ul>
+      </div>
+      <div class="skill-group fade-in">
+        <div class="skill-group-icon">&#128202;</div>
+        <h4>Analysis</h4>
+        <ul class="skill-list"><li>Data Visualization</li><li>Research &amp; Synthesis</li><li>Spreadsheets &amp; SQL</li><li>Storytelling with Data</li></ul>
+      </div>
+      <div class="skill-group fade-in">
+        <div class="skill-group-icon">&#129309;</div>
+        <h4>Collaboration</h4>
+        <ul class="skill-list"><li>Cross-functional Teams</li><li>Project Management</li><li>Communication</li><li>Mentorship</li></ul>
+      </div>
+    </div>
+  </section>
+  <section class="contact-section" id="contact">
+    <div class="fade-in">
+      <p class="section-label" style="justify-content:center;">Contact</p>
+      <h2>Let's connect</h2>
+      <p>I'd love to hear from you — whether it's about a project, an opportunity, or just to say hi.</p>
+      <div class="contact-links">
+        <a href="mailto:monica.qw.wang@gmail.com" class="contact-chip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email Me
+        </a>
+        <a href="https://github.com/moniwang" target="_blank" class="contact-chip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          GitHub
+        </a>
+        <a href="https://linkedin.com/in/moniwang" target="_blank" class="contact-chip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <p>Designed &amp; built with &#10084; by Monica Wang &middot; <a href="https://moniwang.github.io">moniwang.github.io</a></p>
+  </footer>
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+      navLinks.forEach(a => { a.style.color = a.getAttribute('href') === '#'+current ? 'var(--terracotta)' : ''; });
+    });
+  </script>
 </body>
-
 </html>
