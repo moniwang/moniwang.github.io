@@ -49,6 +49,15 @@
       transform: translateX(-50%);
       z-index: 10; pointer-events: none;
     }
+    /* Bob wrapper — handles vertical bounce independently from direction flip */
+    #char-bob { display: block; }
+    @keyframes bob {
+      0%,100% { transform: translateY(0px); }
+      25%      { transform: translateY(-6px); }
+      75%      { transform: translateY(-6px); }
+    }
+    #char-bob.walking { animation: bob 0.4s ease-in-out infinite; }
+
     #char {
       display: block;
       transform: scaleX(1);
@@ -56,22 +65,45 @@
       overflow: visible;
     }
 
-    /* SVG animated groups */
+    /* SVG animated groups — pivot from top-center of each limb */
     .c-arm-l, .c-arm-r, .c-leg-l, .c-leg-r {
       transform-box: fill-box;
       transform-origin: 50% 0%;
     }
 
-    /* Walking keyframes */
-    @keyframes legA { 0%,100%{transform:rotate(-30deg)} 50%{transform:rotate(30deg)} }
-    @keyframes legB { 0%,100%{transform:rotate(30deg)}  50%{transform:rotate(-30deg)} }
-    @keyframes armA { 0%,100%{transform:rotate(26deg)}  50%{transform:rotate(-26deg)} }
-    @keyframes armB { 0%,100%{transform:rotate(-26deg)} 50%{transform:rotate(26deg)} }
+    /*
+     * Natural walk cycle:
+     *  - Legs swing ±32° with a cubic ease so they accelerate through centre
+     *    and decelerate at the extremes (feels less like a metronome).
+     *  - Arms are opposite to legs and smaller (±22°).
+     *  - Both legs/arms share one 0.4 s cycle but start 180° out of phase.
+     */
+    @keyframes legFwd {
+      0%   { transform: rotate(-32deg); }
+      50%  { transform: rotate( 32deg); }
+      100% { transform: rotate(-32deg); }
+    }
+    @keyframes legBwd {
+      0%   { transform: rotate( 32deg); }
+      50%  { transform: rotate(-32deg); }
+      100% { transform: rotate( 32deg); }
+    }
+    @keyframes armFwd {
+      0%   { transform: rotate(-22deg); }
+      50%  { transform: rotate( 22deg); }
+      100% { transform: rotate(-22deg); }
+    }
+    @keyframes armBwd {
+      0%   { transform: rotate( 22deg); }
+      50%  { transform: rotate(-22deg); }
+      100% { transform: rotate( 22deg); }
+    }
 
-    #char.walking .c-leg-l { animation: legA 0.36s ease-in-out infinite; }
-    #char.walking .c-leg-r { animation: legB 0.36s ease-in-out infinite; }
-    #char.walking .c-arm-l { animation: armB 0.36s ease-in-out infinite; }
-    #char.walking .c-arm-r { animation: armA 0.36s ease-in-out infinite; }
+    /* left leg & right arm move together (forward phase) */
+    #char.walking .c-leg-l { animation: legFwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
+    #char.walking .c-leg-r { animation: legBwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
+    #char.walking .c-arm-l { animation: armBwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
+    #char.walking .c-arm-r { animation: armFwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
 
     /* ─── CONTENT PANELS ─── */
     #panels {
@@ -198,95 +230,105 @@
 </div>
 
 <div id="char-wrap">
-  <!-- Cartoon Asian girl character -->
-  <svg id="char" viewBox="0 0 64 112" width="64" height="112" xmlns="http://www.w3.org/2000/svg">
+  <!-- char-bob handles the vertical bounce; #char handles the L/R flip -->
+  <div id="char-bob">
+    <!--
+      Chibi Asian girl — head ≈ 55% of total height, tiny torso, stubby legs.
+      SVG draw order = back-to-front (later elements appear on top).
+    -->
+    <svg id="char" viewBox="0 0 76 126" width="76" height="126"
+         xmlns="http://www.w3.org/2000/svg" overflow="visible">
 
-    <!-- 1. Hair back (behind everything) -->
-    <ellipse cx="32" cy="20" rx="18" ry="21" fill="#1a0c06"/>
+      <!-- ① Big hair volume behind everything -->
+      <ellipse cx="38" cy="30" rx="30" ry="33" fill="#1a0c06"/>
 
-    <!-- 2. Left arm (behind body) -->
-    <g class="c-arm-l">
-      <rect x="7" y="43" width="11" height="25" rx="5.5" fill="#f0bd96"/>
-    </g>
+      <!-- ② Left arm (behind body) -->
+      <g class="c-arm-l">
+        <rect x="4"  y="62" width="14" height="22" rx="7" fill="#f0bd96"/>
+        <ellipse cx="11" cy="85" rx="6" ry="5" fill="#f0bd96"/>
+      </g>
 
-    <!-- 3. Right arm (behind body) -->
-    <g class="c-arm-r">
-      <rect x="46" y="43" width="11" height="25" rx="5.5" fill="#f0bd96"/>
-    </g>
+      <!-- ③ Right arm -->
+      <g class="c-arm-r">
+        <rect x="58" y="62" width="14" height="22" rx="7" fill="#f0bd96"/>
+        <ellipse cx="65" cy="85" rx="6" ry="5" fill="#f0bd96"/>
+      </g>
 
-    <!-- 4. Shirt -->
-    <rect x="17" y="42" width="30" height="20" rx="7" fill="#e8906a"/>
-    <!-- Shirt collar V -->
-    <path d="M26 42 L32 50 L38 42" stroke="rgba(255,255,255,0.55)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- ④ Shirt (tiny chibi torso) -->
+      <rect x="20" y="60" width="36" height="22" rx="9" fill="#e8906a"/>
+      <path d="M30 60 L38 70 L46 60"
+            stroke="rgba(255,255,255,0.55)" stroke-width="2"
+            fill="none" stroke-linecap="round" stroke-linejoin="round"/>
 
-    <!-- 5. Left leg (drawn before skirt so skirt covers the top) -->
-    <g class="c-leg-l">
-      <rect x="18" y="76" width="12" height="32" rx="6" fill="#f0bd96"/>
-      <!-- Shoe -->
-      <ellipse cx="24" cy="108" rx="11" ry="6.5" fill="#2e1a0e"/>
-      <ellipse cx="22" cy="106" rx="7.5" ry="4" fill="#4a2c18" opacity="0.55"/>
-    </g>
+      <!-- ⑤ Left leg — drawn before skirt so skirt hides the hip -->
+      <g class="c-leg-l">
+        <rect x="22" y="94" width="14" height="24" rx="7" fill="#f0bd96"/>
+        <ellipse cx="29" cy="120" rx="13" ry="7"   fill="#2e1a0e"/>
+        <ellipse cx="27" cy="118" rx="9"  ry="4.5" fill="#4a2c18" opacity="0.5"/>
+      </g>
 
-    <!-- 6. Right leg -->
-    <g class="c-leg-r">
-      <rect x="34" y="76" width="12" height="32" rx="6" fill="#f0bd96"/>
-      <!-- Shoe -->
-      <ellipse cx="40" cy="108" rx="11" ry="6.5" fill="#2e1a0e"/>
-      <ellipse cx="38" cy="106" rx="7.5" ry="4" fill="#4a2c18" opacity="0.55"/>
-    </g>
+      <!-- ⑥ Right leg -->
+      <g class="c-leg-r">
+        <rect x="40" y="94" width="14" height="24" rx="7" fill="#f0bd96"/>
+        <ellipse cx="47" cy="120" rx="13" ry="7"   fill="#2e1a0e"/>
+        <ellipse cx="45" cy="118" rx="9"  ry="4.5" fill="#4a2c18" opacity="0.5"/>
+      </g>
 
-    <!-- 7. Skirt (covers leg tops) -->
-    <path d="M14 60 L50 60 L56 84 L8 84Z" fill="#c8705a"/>
-    <!-- Skirt pleat/highlight lines -->
-    <line x1="24" y1="60" x2="22" y2="83" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
-    <line x1="32" y1="60" x2="32" y2="83" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
-    <line x1="40" y1="60" x2="42" y2="83" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
-    <!-- Skirt hem -->
-    <line x1="8" y1="82" x2="56" y2="82" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <!-- ⑦ Skirt — wide chibi trapezoid, covers leg tops -->
+      <path d="M16 78 L60 78 L67 100 L9 100Z" fill="#c8705a"/>
+      <line x1="28" y1="78" x2="25" y2="99" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+      <line x1="38" y1="78" x2="38" y2="99" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+      <line x1="48" y1="78" x2="51" y2="99" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+      <line x1="9"  y1="98" x2="67" y2="98" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
 
-    <!-- 8. Hair side strands (in front of shirt, behind face) -->
-    <rect x="11" y="22" width="10" height="28" rx="5" fill="#1a0c06"/>
-    <rect x="43" y="22" width="10" height="28" rx="5" fill="#1a0c06"/>
+      <!-- ⑧ Hair side curtains (over shirt, behind face) -->
+      <rect x="5"  y="32" width="14" height="36" rx="7" fill="#1a0c06"/>
+      <rect x="57" y="32" width="14" height="36" rx="7" fill="#1a0c06"/>
 
-    <!-- 9. Face -->
-    <ellipse cx="32" cy="22" rx="17" ry="19" fill="#f5c9a0"/>
+      <!-- ⑨ Big round chibi face -->
+      <ellipse cx="38" cy="30" rx="28" ry="30" fill="#f5c9a0"/>
 
-    <!-- 10. Bangs -->
-    <path d="M14 14 Q32 4 50 14 Q46 25 32 20 Q18 25 14 14Z" fill="#1a0c06"/>
+      <!-- ⑩ Bangs — wide sweep covers forehead -->
+      <path d="M10 18 Q38 2 66 18 Q62 34 38 26 Q14 34 10 18Z" fill="#1a0c06"/>
 
-    <!-- 11. Eyes -->
-    <ellipse cx="24" cy="23" rx="5" ry="5.5" fill="#1a0c06"/>
-    <ellipse cx="40" cy="23" rx="5" ry="5.5" fill="#1a0c06"/>
-    <!-- Iris highlight -->
-    <circle cx="26.2" cy="21" r="2" fill="white"/>
-    <circle cx="42.2" cy="21" r="2" fill="white"/>
-    <!-- Small secondary shine -->
-    <circle cx="23" cy="25" r="1" fill="white" opacity="0.6"/>
-    <circle cx="39" cy="25" r="1" fill="white" opacity="0.6"/>
-    <!-- Upper eyelid line -->
-    <path d="M19 18.5 Q24 16 29 18.5" stroke="#1a0c06" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-    <path d="M35 18.5 Q40 16 45 18.5" stroke="#1a0c06" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <!-- ⑪ Big chibi eyes with layered iris+pupil+shine -->
+      <!-- Left -->
+      <ellipse cx="26" cy="30" rx="8"   ry="9"   fill="white"/>
+      <ellipse cx="26" cy="31" rx="6"   ry="7"   fill="#3a1e0c"/>
+      <circle  cx="26" cy="32" r="4.2"           fill="#1a0c06"/>
+      <circle  cx="28.5" cy="27.5" r="2.8"       fill="white"/>
+      <circle  cx="23.5" cy="33"   r="1.4"       fill="white" opacity="0.65"/>
+      <path d="M18 22 Q26 17 34 22" stroke="#1a0c06" stroke-width="2.2"
+            fill="none" stroke-linecap="round"/>
+      <!-- Right -->
+      <ellipse cx="50" cy="30" rx="8"   ry="9"   fill="white"/>
+      <ellipse cx="50" cy="31" rx="6"   ry="7"   fill="#3a1e0c"/>
+      <circle  cx="50" cy="32" r="4.2"           fill="#1a0c06"/>
+      <circle  cx="52.5" cy="27.5" r="2.8"       fill="white"/>
+      <circle  cx="47.5" cy="33"   r="1.4"       fill="white" opacity="0.65"/>
+      <path d="M42 22 Q50 17 58 22" stroke="#1a0c06" stroke-width="2.2"
+            fill="none" stroke-linecap="round"/>
 
-    <!-- 12. Blush -->
-    <ellipse cx="18" cy="28" rx="6.5" ry="4" fill="rgba(255,130,100,0.35)"/>
-    <ellipse cx="46" cy="28" rx="6.5" ry="4" fill="rgba(255,130,100,0.35)"/>
+      <!-- ⑫ Large soft blush -->
+      <ellipse cx="16" cy="38" rx="9"  ry="5.5" fill="rgba(255,120,90,0.32)"/>
+      <ellipse cx="60" cy="38" rx="9"  ry="5.5" fill="rgba(255,120,90,0.32)"/>
 
-    <!-- 13. Nose (tiny) -->
-    <circle cx="32" cy="29" r="1.2" fill="rgba(190,120,80,0.45)"/>
+      <!-- ⑬ Tiny dot nose -->
+      <circle cx="38" cy="40" r="1.8" fill="rgba(185,110,70,0.38)"/>
 
-    <!-- 14. Mouth (small happy smile) -->
-    <path d="M27 34 Q32 39.5 37 34" stroke="#c07848" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <!-- ⑭ Little curved smile -->
+      <path d="M31 47 Q38 54 45 47"
+            stroke="#c07848" stroke-width="2.5"
+            fill="none" stroke-linecap="round"/>
 
-    <!-- 15. Hair clip / bow on right side -->
-    <!-- Bow left petal -->
-    <ellipse cx="45" cy="10" rx="5" ry="3.5" fill="#ff8fa0" transform="rotate(-35,45,10)"/>
-    <!-- Bow right petal -->
-    <ellipse cx="52" cy="10" rx="5" ry="3.5" fill="#ff8fa0" transform="rotate(35,52,10)"/>
-    <!-- Bow center knot -->
-    <circle cx="48.5" cy="10" r="3" fill="#ff6080"/>
-    <circle cx="48.5" cy="10" r="1.5" fill="white" opacity="0.6"/>
+      <!-- ⑮ Pink bow clip -->
+      <ellipse cx="57" cy="12" rx="7" ry="4.5" fill="#ff8fa8" transform="rotate(-32,57,12)"/>
+      <ellipse cx="68" cy="12" rx="7" ry="4.5" fill="#ff8fa8" transform="rotate( 32,68,12)"/>
+      <circle  cx="62.5" cy="12" r="4.5" fill="#ff5f80"/>
+      <circle  cx="62.5" cy="12" r="2"   fill="white" opacity="0.6"/>
 
-  </svg>
+    </svg>
+  </div>
 </div>
 
 <!-- Section content panels -->
@@ -377,6 +419,7 @@ const bgEl     = document.getElementById('world-bg');
 const fgEl     = document.getElementById('world-fg');
 const gScroll  = document.getElementById('ground-scroll');
 const charEl   = document.getElementById('char');
+const charBob  = document.getElementById('char-bob');
 const panels   = document.querySelectorAll('.panel');
 const dots     = document.querySelectorAll('.ndot');
 const hintEl   = document.getElementById('hint');
@@ -496,8 +539,10 @@ function tick() {
   bgEl.style.transform    = `translateX(${-worldX * PAR}px)`;
   gScroll.style.transform = `translateX(${-worldX}px)`;
 
-  // Walk anim
-  charEl.classList.toggle('walking', keys.r || keys.l);
+  // Walk anim (legs+arms on SVG, body bob on wrapper)
+  const isWalking = keys.r || keys.l;
+  charEl.classList.toggle('walking', isWalking);
+  charBob.classList.toggle('walking', isWalking);
 
   // Zone
   const zi = Math.min(Math.floor(worldX / ZONE_W), ZONES.length - 1);
