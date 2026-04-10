@@ -4,7 +4,511 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Monica Wang</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body { font-family: 'Inter', sans-serif; user-select: none; -webkit-user-select: none; }
+
+    /* ─── SKY ─── */
+    #sky {
+      position: fixed; inset: 0; z-index: 0;
+      background: linear-gradient(180deg, #f5e8d8 0%, #fdf3ea 100%);
+      transition: background 1.4s ease;
+    }
+
+    /* ─── WORLD ─── */
+    #world-clip {
+      position: fixed; inset: 0 0 72px 0;
+      overflow: hidden; z-index: 1;
+    }
+    #world-bg, #world-fg {
+      position: absolute; top: 0; left: 0; height: 100%;
+      will-change: transform;
+    }
+    #world-bg { width: 4000px; }
+    #world-fg { width: 8000px; }
+
+    /* ─── GROUND ─── */
+    #ground {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 72px;
+      background: #c17b5e; z-index: 5;
+      transition: background 1.4s ease;
+      overflow: hidden;
+    }
+    #ground-scroll { position: absolute; inset: 0; will-change: transform; }
+    .gmark {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 28px; height: 2px;
+      background: rgba(255,255,255,0.13); border-radius: 1px;
+    }
+
+    /* ─── CHARACTER ─── */
+    #char-wrap {
+      position: fixed; left: 38%; bottom: 72px;
+      transform: translateX(-50%);
+      z-index: 10; pointer-events: none;
+    }
+    #char {
+      position: relative; width: 48px; height: 86px;
+      transform: scaleX(1); transform-origin: center bottom;
+    }
+
+    /* Head */
+    .c-head {
+      position: absolute; width: 24px; height: 24px;
+      background: #2e1f14; border-radius: 50%;
+      left: 12px; top: 0;
+    }
+    .c-head::before, .c-head::after {
+      content: ''; position: absolute;
+      width: 4px; height: 4px;
+      background: #fdf8f3; border-radius: 50%; top: 8px;
+    }
+    .c-head::before { left: 5px; }
+    .c-head::after  { right: 5px; }
+    .c-hair {
+      position: absolute; width: 5px; height: 7px;
+      background: #2e1f14; border-radius: 3px 3px 0 0;
+      top: -5px; left: 10px; transform: rotate(8deg);
+    }
+
+    /* Body */
+    .c-body {
+      position: absolute; width: 20px; height: 24px;
+      background: #c8705a; border-radius: 9px 9px 5px 5px;
+      left: 14px; top: 26px;
+    }
+
+    /* Arms */
+    .c-arm {
+      position: absolute; width: 6px; height: 20px;
+      background: #2e1f14; border-radius: 3px;
+      top: 28px; transform-origin: top center;
+    }
+    .c-arm.l { left:  8px; transform: rotate(22deg); }
+    .c-arm.r { right: 8px; transform: rotate(-22deg); }
+
+    /* Legs */
+    .c-leg {
+      position: absolute; width: 9px; height: 36px;
+      background: #2e1f14; border-radius: 4px 4px 5px 5px;
+      top: 50px; transform-origin: top center;
+    }
+    .c-leg.l { left:  13px; transform: rotate(-4deg); }
+    .c-leg.r { right: 13px; transform: rotate(4deg); }
+    .c-leg::after {
+      content: ''; position: absolute;
+      width: 13px; height: 7px;
+      background: #7a4f3a; border-radius: 6px 6px 3px 3px;
+      bottom: -3px; left: -2px;
+    }
+
+    /* Walking */
+    @keyframes legA { 0%,100%{transform:rotate(-30deg)} 50%{transform:rotate(30deg)} }
+    @keyframes legB { 0%,100%{transform:rotate(30deg)}  50%{transform:rotate(-30deg)} }
+    @keyframes armA { 0%,100%{transform:rotate(28deg)}  50%{transform:rotate(-28deg)} }
+    @keyframes armB { 0%,100%{transform:rotate(-28deg)} 50%{transform:rotate(28deg)} }
+
+    #char.walking .c-leg.l { animation: legA 0.36s ease-in-out infinite; }
+    #char.walking .c-leg.r { animation: legB 0.36s ease-in-out infinite; }
+    #char.walking .c-arm.l { animation: armB 0.36s ease-in-out infinite; }
+    #char.walking .c-arm.r { animation: armA 0.36s ease-in-out infinite; }
+
+    /* ─── CONTENT PANELS ─── */
+    #panels {
+      position: fixed; top: 50%; right: 5%;
+      transform: translateY(-50%);
+      width: min(360px, 36vw);
+      z-index: 20;
+    }
+    .panel {
+      position: absolute; top: 0; right: 0; width: 100%;
+      opacity: 0; transform: translateY(14px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+      pointer-events: none;
+      background: rgba(255,252,248,0.93);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 22px; padding: 2rem;
+      border: 1px solid rgba(200,112,90,0.13);
+      box-shadow: 0 14px 50px rgba(122,79,58,0.1);
+    }
+    .panel.on { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+    .p-tag {
+      font-size: 0.72rem; color: #c8705a; font-weight: 600;
+      letter-spacing: 0.11em; text-transform: uppercase; margin-bottom: 0.35rem;
+    }
+    .panel h2 {
+      font-family: 'Lora', serif; font-size: 1.55rem;
+      color: #2e1f14; line-height: 1.2; margin-bottom: 0.75rem;
+    }
+    .panel p { font-size: 0.87rem; color: #6b5045; line-height: 1.7; margin-bottom: 0.55rem; }
+    .p-sub { font-size: 0.74rem !important; color: #a0836f !important; margin-top: 0.6rem; }
+
+    .proj {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.55rem 0.8rem; border-radius: 11px; margin-bottom: 0.45rem;
+    }
+    .proj-name { font-size: 0.84rem; font-weight: 600; color: #2e1f14; }
+    .proj-tag  { font-size: 0.73rem; color: #6b5045; }
+
+    .cbtn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.55rem 1rem; background: #f0e8dc;
+      border-radius: 50px; text-decoration: none;
+      color: #7a4f3a; font-size: 0.83rem; font-weight: 500;
+      margin-bottom: 0.45rem;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .cbtn:hover { background: #e8d8c8; transform: translateX(3px); }
+
+    /* ─── NAVIGATION DOTS ─── */
+    #nav-dots {
+      position: fixed; bottom: 90px; left: 38%;
+      transform: translateX(-50%);
+      display: flex; align-items: center; gap: 0; z-index: 20;
+    }
+    .ndot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(122,79,58,0.2);
+      transition: background 0.4s, transform 0.4s;
+      cursor: pointer; margin: 0 5px;
+    }
+    .ndot.on { background: #c8705a; transform: scale(1.35); }
+    .nline { width: 28px; height: 1px; background: rgba(122,79,58,0.15); }
+
+    /* ─── HINT ─── */
+    #hint {
+      position: fixed; bottom: 80px; width: 100%; text-align: center;
+      font-size: 0.74rem; color: rgba(122,79,58,0.42);
+      z-index: 20; letter-spacing: 0.04em;
+      transition: opacity 1s ease; pointer-events: none;
+    }
+
+    /* ─── CLICK ZONES (visual arrow hints) ─── */
+    .click-zone {
+      position: fixed; top: 0; bottom: 72px; width: 80px;
+      z-index: 15; display: flex; align-items: center;
+      opacity: 0; transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    .click-zone.left  { left: 0;  justify-content: flex-start; padding-left: 16px; }
+    .click-zone.right { right: 0; justify-content: flex-end;   padding-right: 16px; }
+    .click-zone span {
+      font-size: 1.4rem; color: rgba(122,79,58,0.35);
+    }
+    body:hover .click-zone { opacity: 1; }
+
+    /* ─── WORLD OBJECTS ─── */
+    .wo { position: absolute; }
+    .zone-sign {
+      position: absolute; bottom: 32px;
+      padding: 4px 10px;
+      background: white; border-radius: 7px;
+      font-size: 10.5px; font-family: 'Inter', sans-serif;
+      color: #7a4f3a; font-weight: 500;
+      border: 1px solid rgba(200,112,90,0.2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      white-space: nowrap;
+    }
+    .sign-pole {
+      position: absolute; bottom: 0; width: 3px;
+      background: #a07858; border-radius: 2px;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 700px) {
+      #panels { width: 85vw; right: 50%; transform: translate(50%,-50%); top: 22%; }
+      #char-wrap { left: 50%; }
+      #nav-dots { left: 50%; }
+    }
+  </style>
 </head>
 <body>
+
+<div id="sky"></div>
+
+<div id="world-clip">
+  <div id="world-bg"></div>
+  <div id="world-fg"></div>
+</div>
+
+<div id="ground">
+  <div id="ground-scroll"></div>
+</div>
+
+<div id="char-wrap">
+  <div id="char">
+    <div class="c-head"><div class="c-hair"></div></div>
+    <div class="c-body"></div>
+    <div class="c-arm l"></div>
+    <div class="c-arm r"></div>
+    <div class="c-leg l"></div>
+    <div class="c-leg r"></div>
+  </div>
+</div>
+
+<!-- Section content panels -->
+<div id="panels">
+
+  <div class="panel on" id="p0">
+    <div class="p-tag">Hello there 👋</div>
+    <h2>I'm Monica Wang</h2>
+    <p>Welcome to my little corner of the internet.</p>
+    <p class="p-sub">Walk right to explore → use arrow keys or click &amp; hold the sides of the screen</p>
+  </div>
+
+  <div class="panel" id="p1">
+    <div class="p-tag">About Me</div>
+    <h2>A little about who I am</h2>
+    <p>Hi! I'm Monica — a creator who loves bringing ideas to life through design, code, and collaboration.</p>
+    <p>When I'm not building things, you'll find me exploring coffee shops, reading, or getting lost in a good film.</p>
+  </div>
+
+  <div class="panel" id="p2">
+    <div class="p-tag">Work</div>
+    <h2>Projects I'm proud of</h2>
+    <div class="proj" style="background:#f0e8dc">
+      <span>🌿</span>
+      <div><div class="proj-name">Project One</div><div class="proj-tag">Design &amp; UX</div></div>
+    </div>
+    <div class="proj" style="background:#e8f0e8">
+      <span>🔬</span>
+      <div><div class="proj-name">Project Two</div><div class="proj-tag">Research &amp; Data</div></div>
+    </div>
+    <div class="proj" style="background:#e8eaf5">
+      <span>🚀</span>
+      <div><div class="proj-name">Project Three</div><div class="proj-tag">Product &amp; Strategy</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="p3">
+    <div class="p-tag">Contact</div>
+    <h2>Let's connect</h2>
+    <p>I'd love to hear from you — whether it's about a project, an opportunity, or just to say hi.</p>
+    <a href="mailto:monica.qw.wang@gmail.com" class="cbtn">✉️ monica.qw.wang@gmail.com</a>
+    <a href="https://github.com/moniwang" target="_blank" class="cbtn">⌨️ github.com/moniwang</a>
+    <a href="https://linkedin.com/in/moniwang" target="_blank" class="cbtn">💼 linkedin.com/in/moniwang</a>
+  </div>
+
+</div>
+
+<!-- Navigation dots -->
+<div id="nav-dots">
+  <div class="ndot on" data-z="0"></div>
+  <div class="nline"></div>
+  <div class="ndot" data-z="1"></div>
+  <div class="nline"></div>
+  <div class="ndot" data-z="2"></div>
+  <div class="nline"></div>
+  <div class="ndot" data-z="3"></div>
+</div>
+
+<div id="hint">← → to walk &nbsp;·&nbsp; or click &amp; hold the sides</div>
+
+<!-- Click zone arrows -->
+<div class="click-zone left"><span>‹</span></div>
+<div class="click-zone right"><span>›</span></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────
+const WORLD_W = 6400;
+const ZONE_W  = 1600;
+const SPEED   = 5.5;
+const PAR     = 0.28; // bg parallax factor
+
+const ZONES = [
+  { sky: ['#f5e8d8','#fdf3ea'], gnd: '#c17b5e' },
+  { sky: ['#d8eaf5','#edf6ff'], gnd: '#7a9daa' },
+  { sky: ['#e5daf5','#f3eeff'], gnd: '#9076b4' },
+  { sky: ['#f5edd0','#fff8e0'], gnd: '#c8a042' },
+];
+
+// ── STATE ─────────────────────────────────────────────────
+let worldX  = 0;
+let keys    = { l: false, r: false };
+let curZone = 0;
+
+// ── ELEMENTS ──────────────────────────────────────────────
+const skyEl    = document.getElementById('sky');
+const gndEl    = document.getElementById('ground');
+const bgEl     = document.getElementById('world-bg');
+const fgEl     = document.getElementById('world-fg');
+const gScroll  = document.getElementById('ground-scroll');
+const charEl   = document.getElementById('char');
+const panels   = document.querySelectorAll('.panel');
+const dots     = document.querySelectorAll('.ndot');
+const hintEl   = document.getElementById('hint');
+
+// ── BUILD WORLD ──────────────────────────────────────────
+function mkEl(tag, styles, parent) {
+  const el = document.createElement(tag || 'div');
+  if (styles) Object.assign(el.style, styles);
+  if (parent) parent.appendChild(el);
+  return el;
+}
+
+function buildWorld() {
+  // Ground marks
+  for (let x = 60; x < WORLD_W; x += 90) {
+    mkEl('div', { position:'absolute', left:x+'px', top:'50%',
+      transform:'translateY(-50%)', width:'28px', height:'2px',
+      background:'rgba(255,255,255,0.12)', borderRadius:'1px' }, gScroll);
+  }
+
+  // ── Background layer (parallax ×PAR) ──
+  // Suns / ambient circles — cssX = screenCenter + zoneCenter * PAR
+  const screenCx = window.innerWidth * 0.5;
+  const bgCircles = [
+    { wx:  800, top:  55, r: 80, c: 'rgba(255,215,130,0.28)' },
+    { wx: 2400, top:  40, r: 65, c: 'rgba(160,210,255,0.25)' },
+    { wx: 4000, top:  70, r: 90, c: 'rgba(210,180,255,0.22)' },
+    { wx: 5600, top:  45, r: 75, c: 'rgba(255,235,120,0.28)' },
+    // extra soft shapes
+    { wx:  400, top: 120, r: 50, c: 'rgba(200,155,110,0.1)'  },
+    { wx: 3200, top: 100, r: 45, c: 'rgba(130,175,220,0.1)'  },
+  ];
+  bgCircles.forEach(o => {
+    const cssX = screenCx + o.wx * PAR - o.r;
+    mkEl('div', {
+      position:'absolute', left: cssX+'px', top: o.top+'px',
+      width: o.r*2+'px', height: o.r*2+'px',
+      borderRadius:'50%', background: o.c,
+    }, bgEl);
+  });
+
+  // ── Foreground layer (full speed) ──
+  // Trees
+  const treeXs = [160, 490, 870, 1380, 1750, 2220, 2680, 3050, 3520, 3980, 4410, 4870, 5340, 5800, 6150];
+  treeXs.forEach(tx => {
+    const h  = 42 + Math.floor(Math.random() * 22);
+    const r  = 17 + Math.floor(Math.random() * 9);
+    const hue = Math.floor(Math.random() * 40) - 20;
+    const col = `rgb(${200+hue},${168+hue},${138+hue})`;
+    // trunk
+    mkEl('div', { position:'absolute', left:(tx+r-2)+'px', bottom:'0',
+      width:'5px', height:h+'px', background:'#a07858', borderRadius:'3px' }, fgEl);
+    // crown
+    mkEl('div', { position:'absolute', left:tx+'px', bottom:(h - r*0.55)+'px',
+      width:r*2+'px', height:r*2+'px', borderRadius:'50%', background:col }, fgEl);
+  });
+
+  // Rocks
+  [340, 1100, 2350, 3670, 5100].forEach(rx => {
+    mkEl('div', { position:'absolute', left:rx+'px', bottom:'0',
+      width:'16px', height:'9px', borderRadius:'50%',
+      background:'rgba(190,165,148,0.55)' }, fgEl);
+  });
+
+  // Zone entry signs + poles
+  const signText = ['About ▸', 'Projects ▸', 'Contact ▸'];
+  [ZONE_W, ZONE_W*2, ZONE_W*3].forEach((sx, i) => {
+    const sign = document.createElement('div');
+    sign.className = 'zone-sign';
+    sign.textContent = signText[i];
+    sign.style.left = (sx - 28) + 'px';
+    fgEl.appendChild(sign);
+
+    mkEl('div', { position:'absolute', left:sx+'px', bottom:'0',
+      width:'3px', height:'34px', background:'#a07858', borderRadius:'2px' }, fgEl);
+  });
+
+  // ── Small flowers scattered ──
+  [600, 1250, 2100, 3300, 4600, 5500].forEach(fx => {
+    const flwr = mkEl('div', { position:'absolute', left:fx+'px', bottom:'2px',
+      width:'10px', height:'10px', borderRadius:'50%',
+      background:'rgba(255,200,160,0.7)' }, fgEl);
+    // stem
+    mkEl('div', { position:'absolute', left:(fx+4)+'px', bottom:'0',
+      width:'2px', height:'8px', background:'rgba(120,160,80,0.5)',
+      borderRadius:'1px' }, fgEl);
+  });
+}
+
+// ── ZONE SWITCH ──────────────────────────────────────────
+function setZone(i) {
+  if (i === curZone) return;
+  curZone = i;
+  const z = ZONES[i];
+  skyEl.style.background = `linear-gradient(180deg, ${z.sky[0]} 0%, ${z.sky[1]} 100%)`;
+  gndEl.style.background = z.gnd;
+  panels.forEach((p, pi) => p.classList.toggle('on', pi === i));
+  dots.forEach((d, di)   => d.classList.toggle('on', di === i));
+}
+
+// ── MAIN LOOP ────────────────────────────────────────────
+function tick() {
+  requestAnimationFrame(tick);
+  const maxX = WORLD_W - window.innerWidth;
+
+  // Direction facing
+  if (keys.r) charEl.style.transform = 'scaleX(1)';
+  else if (keys.l) charEl.style.transform = 'scaleX(-1)';
+
+  // Move
+  let moved = false;
+  if (keys.r && worldX < maxX) { worldX = Math.min(worldX + SPEED, maxX); moved = true; }
+  else if (keys.l && worldX > 0) { worldX = Math.max(worldX - SPEED, 0); moved = true; }
+
+  // Apply transforms
+  fgEl.style.transform    = `translateX(${-worldX}px)`;
+  bgEl.style.transform    = `translateX(${-worldX * PAR}px)`;
+  gScroll.style.transform = `translateX(${-worldX}px)`;
+
+  // Walk anim
+  charEl.classList.toggle('walking', keys.r || keys.l);
+
+  // Zone
+  const zi = Math.min(Math.floor(worldX / ZONE_W), ZONES.length - 1);
+  setZone(zi);
+}
+
+// ── INPUT ────────────────────────────────────────────────
+let hintGone = false;
+function hideHint() {
+  if (hintGone) return;
+  hintGone = true;
+  hintEl.style.opacity = '0';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { keys.r = true;  hideHint(); e.preventDefault(); }
+  if (e.key === 'ArrowLeft')  { keys.l = true;  hideHint(); e.preventDefault(); }
+});
+document.addEventListener('keyup', e => {
+  if (e.key === 'ArrowRight') keys.r = false;
+  if (e.key === 'ArrowLeft')  keys.l = false;
+});
+
+function startMove(e) {
+  if (e.target.closest('.panel, a, button, .ndot')) return;
+  hideHint();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  if (cx > window.innerWidth / 2) keys.r = true;
+  else keys.l = true;
+}
+function stopMove() { keys.r = keys.l = false; }
+
+document.addEventListener('mousedown',  startMove);
+document.addEventListener('mouseup',    stopMove);
+document.addEventListener('mouseleave', stopMove);
+document.addEventListener('touchstart', startMove, { passive: true });
+document.addEventListener('touchend',   stopMove);
+
+// Dot click → jump to zone
+dots.forEach((d, i) => {
+  d.style.pointerEvents = 'auto';
+  d.addEventListener('click', () => { worldX = i * ZONE_W; hideHint(); });
+});
+
+// ── INIT ─────────────────────────────────────────────────
+buildWorld();
+setZone(0);
+tick();
+setTimeout(hideHint, 5000);
+</script>
+
 </body>
 </html>
