@@ -65,45 +65,36 @@
       overflow: visible;
     }
 
-    /* SVG animated groups — pivot from top-center of each limb */
-    .c-arm-l, .c-arm-r, .c-leg-l, .c-leg-r {
+    /* All animated limb groups pivot from their top-centre */
+    .c-leg-fl, .c-leg-fr, .c-leg-bl, .c-leg-br, .c-tail {
       transform-box: fill-box;
       transform-origin: 50% 0%;
     }
 
     /*
-     * Natural walk cycle:
-     *  - Legs swing ±32° with a cubic ease so they accelerate through centre
-     *    and decelerate at the extremes (feels less like a metronome).
-     *  - Arms are opposite to legs and smaller (±22°).
-     *  - Both legs/arms share one 0.4 s cycle but start 180° out of phase.
+     * Dog trot: diagonal pairs move together.
+     * Front-left + Back-right swing forward simultaneously.
+     * Front-right + Back-left swing backward.
+     * Cubic ease = fluid, not robotic.
      */
     @keyframes legFwd {
-      0%   { transform: rotate(-32deg); }
-      50%  { transform: rotate( 32deg); }
-      100% { transform: rotate(-32deg); }
+      0%,100% { transform: rotate(-28deg); }
+      50%      { transform: rotate( 28deg); }
     }
     @keyframes legBwd {
-      0%   { transform: rotate( 32deg); }
-      50%  { transform: rotate(-32deg); }
-      100% { transform: rotate( 32deg); }
+      0%,100% { transform: rotate( 28deg); }
+      50%      { transform: rotate(-28deg); }
     }
-    @keyframes armFwd {
-      0%   { transform: rotate(-22deg); }
-      50%  { transform: rotate( 22deg); }
-      100% { transform: rotate(-22deg); }
-    }
-    @keyframes armBwd {
-      0%   { transform: rotate( 22deg); }
-      50%  { transform: rotate(-22deg); }
-      100% { transform: rotate( 22deg); }
+    @keyframes tailWag {
+      0%,100% { transform: rotate(-14deg); }
+      50%      { transform: rotate( 14deg); }
     }
 
-    /* left leg & right arm move together (forward phase) */
-    #char.walking .c-leg-l { animation: legFwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
-    #char.walking .c-leg-r { animation: legBwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
-    #char.walking .c-arm-l { animation: armBwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
-    #char.walking .c-arm-r { animation: armFwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
+    #char.walking .c-leg-fl { animation: legFwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
+    #char.walking .c-leg-fr { animation: legBwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
+    #char.walking .c-leg-bl { animation: legBwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
+    #char.walking .c-leg-br { animation: legFwd 0.4s cubic-bezier(0.45,0,0.55,1) infinite; }
+    #char.walking .c-tail   { animation: tailWag 0.3s ease-in-out infinite; }
 
     /* ─── CONTENT PANELS ─── */
     #panels {
@@ -233,99 +224,101 @@
   <!-- char-bob handles the vertical bounce; #char handles the L/R flip -->
   <div id="char-bob">
     <!--
-      Chibi Asian girl — head ≈ 55% of total height, tiny torso, stubby legs.
+      Chibi Malamute dog — side profile facing right.
+      Body is wide & low, big fluffy head, curly tail, 4 stubby legs.
       SVG draw order = back-to-front (later elements appear on top).
+      Classes: c-leg-bl, c-leg-br (back), c-leg-fl, c-leg-fr (front), c-tail
     -->
-    <svg id="char" viewBox="0 0 76 126" width="76" height="126"
+    <svg id="char" viewBox="0 0 140 92" width="140" height="92"
          xmlns="http://www.w3.org/2000/svg" overflow="visible">
 
-      <!-- ① Big hair volume behind everything -->
-      <ellipse cx="38" cy="30" rx="30" ry="33" fill="#1a0c06"/>
-
-      <!-- ② Left arm (behind body) -->
-      <g class="c-arm-l">
-        <rect x="4"  y="62" width="14" height="22" rx="7" fill="#f0bd96"/>
-        <ellipse cx="11" cy="85" rx="6" ry="5" fill="#f0bd96"/>
+      <!-- ① Fluffy curly tail (behind body) -->
+      <g class="c-tail">
+        <!-- pivot at rump ~(30,44) -->
+        <ellipse cx="22" cy="28" rx="16" ry="12" fill="#3a4855" transform="rotate(-30,22,28)"/>
+        <ellipse cx="18" cy="22" rx="11" ry="8"  fill="#5c6e7a" transform="rotate(-50,18,22)"/>
+        <ellipse cx="14" cy="16" rx="8"  ry="6"  fill="#f0ece4" transform="rotate(-65,14,16)"/>
+        <!-- fluffy tip -->
+        <ellipse cx="10" cy="12" rx="7"  ry="5"  fill="white"   transform="rotate(-70,10,12)"/>
       </g>
 
-      <!-- ③ Right arm -->
-      <g class="c-arm-r">
-        <rect x="58" y="62" width="14" height="22" rx="7" fill="#f0bd96"/>
-        <ellipse cx="65" cy="85" rx="6" ry="5" fill="#f0bd96"/>
+      <!-- ② Back-right leg (far side, drawn darkened behind body) -->
+      <g class="c-leg-br">
+        <rect x="32" y="56" width="13" height="22" rx="6" fill="#2e3840"/>
+        <ellipse cx="38" cy="79" rx="10" ry="5" fill="#1e262c"/>
       </g>
 
-      <!-- ④ Shirt (tiny chibi torso) -->
-      <rect x="20" y="60" width="36" height="22" rx="9" fill="#e8906a"/>
-      <path d="M30 60 L38 70 L46 60"
-            stroke="rgba(255,255,255,0.55)" stroke-width="2"
-            fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-
-      <!-- ⑤ Left leg — drawn before skirt so skirt hides the hip -->
-      <g class="c-leg-l">
-        <rect x="22" y="94" width="14" height="24" rx="7" fill="#f0bd96"/>
-        <ellipse cx="29" cy="120" rx="13" ry="7"   fill="#2e1a0e"/>
-        <ellipse cx="27" cy="118" rx="9"  ry="4.5" fill="#4a2c18" opacity="0.5"/>
+      <!-- ③ Front-right leg (far side) -->
+      <g class="c-leg-fr">
+        <rect x="86" y="56" width="13" height="22" rx="6" fill="#2e3840"/>
+        <ellipse cx="92" cy="79" rx="10" ry="5" fill="#1e262c"/>
       </g>
 
-      <!-- ⑥ Right leg -->
-      <g class="c-leg-r">
-        <rect x="40" y="94" width="14" height="24" rx="7" fill="#f0bd96"/>
-        <ellipse cx="47" cy="120" rx="13" ry="7"   fill="#2e1a0e"/>
-        <ellipse cx="45" cy="118" rx="9"  ry="4.5" fill="#4a2c18" opacity="0.5"/>
+      <!-- ④ Main body — wide fluffy barrel -->
+      <ellipse cx="68" cy="50" rx="48" ry="30" fill="#3a4855"/>
+      <!-- cream belly patch -->
+      <ellipse cx="68" cy="58" rx="34" ry="16" fill="#f0ece4"/>
+
+      <!-- ⑤ Back-left leg (near side) -->
+      <g class="c-leg-bl">
+        <rect x="38" y="58" width="14" height="22" rx="6" fill="#3a4855"/>
+        <ellipse cx="45" cy="81" rx="11" ry="5.5" fill="#2a3540"/>
       </g>
 
-      <!-- ⑦ Skirt — wide chibi trapezoid, covers leg tops -->
-      <path d="M16 78 L60 78 L67 100 L9 100Z" fill="#c8705a"/>
-      <line x1="28" y1="78" x2="25" y2="99" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
-      <line x1="38" y1="78" x2="38" y2="99" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
-      <line x1="48" y1="78" x2="51" y2="99" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
-      <line x1="9"  y1="98" x2="67" y2="98" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <!-- ⑥ Front-left leg (near side) -->
+      <g class="c-leg-fl">
+        <rect x="92" y="58" width="14" height="22" rx="6" fill="#3a4855"/>
+        <ellipse cx="99" cy="81" rx="11" ry="5.5" fill="#2a3540"/>
+      </g>
 
-      <!-- ⑧ Hair side curtains (over shirt, behind face) -->
-      <rect x="5"  y="32" width="14" height="36" rx="7" fill="#1a0c06"/>
-      <rect x="57" y="32" width="14" height="36" rx="7" fill="#1a0c06"/>
+      <!-- ⑦ Neck fluff -->
+      <ellipse cx="106" cy="44" rx="18" ry="16" fill="#3a4855"/>
+      <ellipse cx="108" cy="48" rx="13" ry="11" fill="#f0ece4"/>
 
-      <!-- ⑨ Big round chibi face -->
-      <ellipse cx="38" cy="30" rx="28" ry="30" fill="#f5c9a0"/>
+      <!-- ⑧ Big chibi head -->
+      <ellipse cx="116" cy="28" rx="22" ry="20" fill="#3a4855"/>
 
-      <!-- ⑩ Bangs — wide sweep covers forehead -->
-      <path d="M10 18 Q38 2 66 18 Q62 34 38 26 Q14 34 10 18Z" fill="#1a0c06"/>
+      <!-- ⑨ Face cream mask -->
+      <ellipse cx="122" cy="32" rx="14" ry="13" fill="#f0ece4"/>
 
-      <!-- ⑪ Big chibi eyes with layered iris+pupil+shine -->
-      <!-- Left -->
-      <ellipse cx="26" cy="30" rx="8"   ry="9"   fill="white"/>
-      <ellipse cx="26" cy="31" rx="6"   ry="7"   fill="#3a1e0c"/>
-      <circle  cx="26" cy="32" r="4.2"           fill="#1a0c06"/>
-      <circle  cx="28.5" cy="27.5" r="2.8"       fill="white"/>
-      <circle  cx="23.5" cy="33"   r="1.4"       fill="white" opacity="0.65"/>
-      <path d="M18 22 Q26 17 34 22" stroke="#1a0c06" stroke-width="2.2"
-            fill="none" stroke-linecap="round"/>
-      <!-- Right -->
-      <ellipse cx="50" cy="30" rx="8"   ry="9"   fill="white"/>
-      <ellipse cx="50" cy="31" rx="6"   ry="7"   fill="#3a1e0c"/>
-      <circle  cx="50" cy="32" r="4.2"           fill="#1a0c06"/>
-      <circle  cx="52.5" cy="27.5" r="2.8"       fill="white"/>
-      <circle  cx="47.5" cy="33"   r="1.4"       fill="white" opacity="0.65"/>
-      <path d="M42 22 Q50 17 58 22" stroke="#1a0c06" stroke-width="2.2"
-            fill="none" stroke-linecap="round"/>
+      <!-- ⑩ Ear (pointed, behind head top) -->
+      <polygon points="104,14 110,2 118,14" fill="#3a4855"/>
+      <polygon points="106,13 110,5 116,13" fill="#d4b8a0" opacity="0.6"/>
 
-      <!-- ⑫ Large soft blush -->
-      <ellipse cx="16" cy="38" rx="9"  ry="5.5" fill="rgba(255,120,90,0.32)"/>
-      <ellipse cx="60" cy="38" rx="9"  ry="5.5" fill="rgba(255,120,90,0.32)"/>
+      <!-- ⑪ Second ear (slightly behind first) -->
+      <polygon points="112,13 118,3 125,13" fill="#2e3840"/>
 
-      <!-- ⑬ Tiny dot nose -->
-      <circle cx="38" cy="40" r="1.8" fill="rgba(185,110,70,0.38)"/>
+      <!-- ⑫ Forehead fluff markings -->
+      <ellipse cx="113" cy="20" rx="9" ry="7" fill="#5c6e7a" opacity="0.55"/>
 
-      <!-- ⑭ Little curved smile -->
-      <path d="M31 47 Q38 54 45 47"
-            stroke="#c07848" stroke-width="2.5"
-            fill="none" stroke-linecap="round"/>
+      <!-- ⑬ Big amber chibi eye -->
+      <ellipse cx="126" cy="26" rx="7"   ry="7.5" fill="white"/>
+      <ellipse cx="126" cy="27" rx="5.5" ry="6"   fill="#b87c2a"/>
+      <circle  cx="126" cy="28" r="4"              fill="#1a1a1a"/>
+      <circle  cx="128.5" cy="24.5" r="2.2"        fill="white"/>
+      <circle  cx="123.5" cy="29"   r="1.1"        fill="white" opacity="0.6"/>
 
-      <!-- ⑮ Pink bow clip -->
-      <ellipse cx="57" cy="12" rx="7" ry="4.5" fill="#ff8fa8" transform="rotate(-32,57,12)"/>
-      <ellipse cx="68" cy="12" rx="7" ry="4.5" fill="#ff8fa8" transform="rotate( 32,68,12)"/>
-      <circle  cx="62.5" cy="12" r="4.5" fill="#ff5f80"/>
-      <circle  cx="62.5" cy="12" r="2"   fill="white" opacity="0.6"/>
+      <!-- ⑭ Eyebrow dot (expressive) -->
+      <ellipse cx="123" cy="19" rx="4" ry="1.8" fill="#2e3840" opacity="0.7"/>
+
+      <!-- ⑮ Snout / muzzle -->
+      <ellipse cx="134" cy="34" rx="8" ry="6" fill="#f0ece4"/>
+      <!-- black nose -->
+      <ellipse cx="137" cy="31" rx="4" ry="3" fill="#1a1a1a"/>
+      <ellipse cx="136" cy="30" rx="1.5" ry="1" fill="white" opacity="0.5"/>
+      <!-- smile line -->
+      <path d="M132 35 Q134 38 137 36" stroke="#9a7060" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- tiny tongue -->
+      <ellipse cx="135" cy="38" rx="3" ry="2.5" fill="#e8748a"/>
+
+      <!-- ⑯ Blush cheek -->
+      <ellipse cx="122" cy="33" rx="6" ry="3.5" fill="rgba(230,130,110,0.35)"/>
+
+      <!-- ⑰ Collar (terracotta) -->
+      <rect x="101" y="52" width="18" height="7" rx="3.5" fill="#c8705a"/>
+      <!-- collar tag -->
+      <ellipse cx="110" cy="61" rx="4" ry="3.5" fill="#d4924e"/>
+      <ellipse cx="110" cy="61" rx="2.5" ry="2" fill="#e8b870"/>
 
     </svg>
   </div>
