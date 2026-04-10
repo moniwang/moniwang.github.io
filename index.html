@@ -50,70 +50,28 @@
       z-index: 10; pointer-events: none;
     }
     #char {
-      position: relative; width: 48px; height: 86px;
-      transform: scaleX(1); transform-origin: center bottom;
+      display: block;
+      transform: scaleX(1);
+      transform-origin: center bottom;
+      overflow: visible;
     }
 
-    /* Head */
-    .c-head {
-      position: absolute; width: 24px; height: 24px;
-      background: #2e1f14; border-radius: 50%;
-      left: 12px; top: 0;
-    }
-    .c-head::before, .c-head::after {
-      content: ''; position: absolute;
-      width: 4px; height: 4px;
-      background: #fdf8f3; border-radius: 50%; top: 8px;
-    }
-    .c-head::before { left: 5px; }
-    .c-head::after  { right: 5px; }
-    .c-hair {
-      position: absolute; width: 5px; height: 7px;
-      background: #2e1f14; border-radius: 3px 3px 0 0;
-      top: -5px; left: 10px; transform: rotate(8deg);
+    /* SVG animated groups */
+    .c-arm-l, .c-arm-r, .c-leg-l, .c-leg-r {
+      transform-box: fill-box;
+      transform-origin: 50% 0%;
     }
 
-    /* Body */
-    .c-body {
-      position: absolute; width: 20px; height: 24px;
-      background: #c8705a; border-radius: 9px 9px 5px 5px;
-      left: 14px; top: 26px;
-    }
-
-    /* Arms */
-    .c-arm {
-      position: absolute; width: 6px; height: 20px;
-      background: #2e1f14; border-radius: 3px;
-      top: 28px; transform-origin: top center;
-    }
-    .c-arm.l { left:  8px; transform: rotate(22deg); }
-    .c-arm.r { right: 8px; transform: rotate(-22deg); }
-
-    /* Legs */
-    .c-leg {
-      position: absolute; width: 9px; height: 36px;
-      background: #2e1f14; border-radius: 4px 4px 5px 5px;
-      top: 50px; transform-origin: top center;
-    }
-    .c-leg.l { left:  13px; transform: rotate(-4deg); }
-    .c-leg.r { right: 13px; transform: rotate(4deg); }
-    .c-leg::after {
-      content: ''; position: absolute;
-      width: 13px; height: 7px;
-      background: #7a4f3a; border-radius: 6px 6px 3px 3px;
-      bottom: -3px; left: -2px;
-    }
-
-    /* Walking */
+    /* Walking keyframes */
     @keyframes legA { 0%,100%{transform:rotate(-30deg)} 50%{transform:rotate(30deg)} }
     @keyframes legB { 0%,100%{transform:rotate(30deg)}  50%{transform:rotate(-30deg)} }
-    @keyframes armA { 0%,100%{transform:rotate(28deg)}  50%{transform:rotate(-28deg)} }
-    @keyframes armB { 0%,100%{transform:rotate(-28deg)} 50%{transform:rotate(28deg)} }
+    @keyframes armA { 0%,100%{transform:rotate(26deg)}  50%{transform:rotate(-26deg)} }
+    @keyframes armB { 0%,100%{transform:rotate(-26deg)} 50%{transform:rotate(26deg)} }
 
-    #char.walking .c-leg.l { animation: legA 0.36s ease-in-out infinite; }
-    #char.walking .c-leg.r { animation: legB 0.36s ease-in-out infinite; }
-    #char.walking .c-arm.l { animation: armB 0.36s ease-in-out infinite; }
-    #char.walking .c-arm.r { animation: armA 0.36s ease-in-out infinite; }
+    #char.walking .c-leg-l { animation: legA 0.36s ease-in-out infinite; }
+    #char.walking .c-leg-r { animation: legB 0.36s ease-in-out infinite; }
+    #char.walking .c-arm-l { animation: armB 0.36s ease-in-out infinite; }
+    #char.walking .c-arm-r { animation: armA 0.36s ease-in-out infinite; }
 
     /* ─── CONTENT PANELS ─── */
     #panels {
@@ -240,14 +198,95 @@
 </div>
 
 <div id="char-wrap">
-  <div id="char">
-    <div class="c-head"><div class="c-hair"></div></div>
-    <div class="c-body"></div>
-    <div class="c-arm l"></div>
-    <div class="c-arm r"></div>
-    <div class="c-leg l"></div>
-    <div class="c-leg r"></div>
-  </div>
+  <!-- Cartoon Asian girl character -->
+  <svg id="char" viewBox="0 0 64 112" width="64" height="112" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- 1. Hair back (behind everything) -->
+    <ellipse cx="32" cy="20" rx="18" ry="21" fill="#1a0c06"/>
+
+    <!-- 2. Left arm (behind body) -->
+    <g class="c-arm-l">
+      <rect x="7" y="43" width="11" height="25" rx="5.5" fill="#f0bd96"/>
+    </g>
+
+    <!-- 3. Right arm (behind body) -->
+    <g class="c-arm-r">
+      <rect x="46" y="43" width="11" height="25" rx="5.5" fill="#f0bd96"/>
+    </g>
+
+    <!-- 4. Shirt -->
+    <rect x="17" y="42" width="30" height="20" rx="7" fill="#e8906a"/>
+    <!-- Shirt collar V -->
+    <path d="M26 42 L32 50 L38 42" stroke="rgba(255,255,255,0.55)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- 5. Left leg (drawn before skirt so skirt covers the top) -->
+    <g class="c-leg-l">
+      <rect x="18" y="76" width="12" height="32" rx="6" fill="#f0bd96"/>
+      <!-- Shoe -->
+      <ellipse cx="24" cy="108" rx="11" ry="6.5" fill="#2e1a0e"/>
+      <ellipse cx="22" cy="106" rx="7.5" ry="4" fill="#4a2c18" opacity="0.55"/>
+    </g>
+
+    <!-- 6. Right leg -->
+    <g class="c-leg-r">
+      <rect x="34" y="76" width="12" height="32" rx="6" fill="#f0bd96"/>
+      <!-- Shoe -->
+      <ellipse cx="40" cy="108" rx="11" ry="6.5" fill="#2e1a0e"/>
+      <ellipse cx="38" cy="106" rx="7.5" ry="4" fill="#4a2c18" opacity="0.55"/>
+    </g>
+
+    <!-- 7. Skirt (covers leg tops) -->
+    <path d="M14 60 L50 60 L56 84 L8 84Z" fill="#c8705a"/>
+    <!-- Skirt pleat/highlight lines -->
+    <line x1="24" y1="60" x2="22" y2="83" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+    <line x1="32" y1="60" x2="32" y2="83" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+    <line x1="40" y1="60" x2="42" y2="83" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+    <!-- Skirt hem -->
+    <line x1="8" y1="82" x2="56" y2="82" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+
+    <!-- 8. Hair side strands (in front of shirt, behind face) -->
+    <rect x="11" y="22" width="10" height="28" rx="5" fill="#1a0c06"/>
+    <rect x="43" y="22" width="10" height="28" rx="5" fill="#1a0c06"/>
+
+    <!-- 9. Face -->
+    <ellipse cx="32" cy="22" rx="17" ry="19" fill="#f5c9a0"/>
+
+    <!-- 10. Bangs -->
+    <path d="M14 14 Q32 4 50 14 Q46 25 32 20 Q18 25 14 14Z" fill="#1a0c06"/>
+
+    <!-- 11. Eyes -->
+    <ellipse cx="24" cy="23" rx="5" ry="5.5" fill="#1a0c06"/>
+    <ellipse cx="40" cy="23" rx="5" ry="5.5" fill="#1a0c06"/>
+    <!-- Iris highlight -->
+    <circle cx="26.2" cy="21" r="2" fill="white"/>
+    <circle cx="42.2" cy="21" r="2" fill="white"/>
+    <!-- Small secondary shine -->
+    <circle cx="23" cy="25" r="1" fill="white" opacity="0.6"/>
+    <circle cx="39" cy="25" r="1" fill="white" opacity="0.6"/>
+    <!-- Upper eyelid line -->
+    <path d="M19 18.5 Q24 16 29 18.5" stroke="#1a0c06" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <path d="M35 18.5 Q40 16 45 18.5" stroke="#1a0c06" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+
+    <!-- 12. Blush -->
+    <ellipse cx="18" cy="28" rx="6.5" ry="4" fill="rgba(255,130,100,0.35)"/>
+    <ellipse cx="46" cy="28" rx="6.5" ry="4" fill="rgba(255,130,100,0.35)"/>
+
+    <!-- 13. Nose (tiny) -->
+    <circle cx="32" cy="29" r="1.2" fill="rgba(190,120,80,0.45)"/>
+
+    <!-- 14. Mouth (small happy smile) -->
+    <path d="M27 34 Q32 39.5 37 34" stroke="#c07848" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+    <!-- 15. Hair clip / bow on right side -->
+    <!-- Bow left petal -->
+    <ellipse cx="45" cy="10" rx="5" ry="3.5" fill="#ff8fa0" transform="rotate(-35,45,10)"/>
+    <!-- Bow right petal -->
+    <ellipse cx="52" cy="10" rx="5" ry="3.5" fill="#ff8fa0" transform="rotate(35,52,10)"/>
+    <!-- Bow center knot -->
+    <circle cx="48.5" cy="10" r="3" fill="#ff6080"/>
+    <circle cx="48.5" cy="10" r="1.5" fill="white" opacity="0.6"/>
+
+  </svg>
 </div>
 
 <!-- Section content panels -->
